@@ -1,45 +1,44 @@
 "use strict";
-var aCodeAscii = 'a'.charCodeAt(0);
-var zCodeAscii = 'z'.charCodeAt(0);
-var nEnglishLetters = zCodeAscii - aCodeAscii + 1;
-function shiftCipher(str, shift) {
-    if (shift === void 0) { shift = 1; }
-    //TODO
-    //for each lower case letter (a-z) you should 
-    //perform code ASCII on a given shift (add)
-    //shift should be in cycle of lower case letters
-    // code ASCII 'z' + 2 = code ASCII 'b'
-    //examples:
-    //shiftCipher("abz.", 3) => "dec."
-    var arStr = Array.from(str);
-    var arRes = arStr.map(function (sym) {
-        var res = sym;
-        if (sym <= 'z' && sym >= 'a') {
-            var actualShift = (sym.charCodeAt(0) - aCodeAscii + shift) % nEnglishLetters;
-            res = String.fromCharCode(aCodeAscii + actualShift);
-        }
-    });
-    return arRes.join('');
+const aCodeAscii = 'a'.charCodeAt(0);
+const zCodeAscii = 'z'.charCodeAt(0);
+const nEnglishLetters = zCodeAscii - aCodeAscii + 1;
+function shiftCipher(str, shift = 1) {
+    return cipherDecipher(str, shift, mapperCipher);
 }
-function shiftDecipher(str, shift) {
-    if (shift === void 0) { shift = 1; }
-    //TODO
-    //for each lower case letter (a-z) you should 
-    //perform code ASCII on a given shift (subtract)
-    //shift should be in cycle of lower case letters
-    // code ASCII 'z' - 2 = code ASCII 'x'
-    //examples:
-    //shiftCipher("dec.", 3) => "abz."
-    var arStr = Array.from(str);
-    var arRes = arStr.map(function (sym) {
-        var res = sym;
-        if (sym <= 'z' && sym >= 'a') {
-            var actualShift = (zCodeAscii - sym.charCodeAt(0) + shift) % nEnglishLetters;
-            res = String.fromCharCode(zCodeAscii - actualShift);
+function shiftDecipher(str, shift = 1) {
+    return cipherDecipher(str, shift, mapperDecipher);
+}
+function cipherDecipher(str, shift, mapperFun) {
+    //const arStr: string[] = Array.from(str);
+    const arStr = Array.from(str);
+    const arRes = arStr.map(symb => {
+        let res = symb;
+        if (symb <= 'z' && symb >= 'a') {
+            res = mapperFun(symb, shift);
         }
         return res;
     });
     return arRes.join('');
 }
-console.log(shiftDecipher("mnl", 1000));
+function mapperCipher(symb, shift) {
+    const actualShift = (symb.charCodeAt(0) - aCodeAscii + shift) % nEnglishLetters;
+    return String.fromCharCode(aCodeAscii + actualShift);
+}
+function mapperDecipher(symb, shift) {
+    const actualShift = (zCodeAscii - symb.charCodeAt(0) + shift) % nEnglishLetters;
+    return String.fromCharCode(zCodeAscii - actualShift);
+}
+function testCipherDecipher(data, testName) {
+    console.log(`${"*".repeat(10)}${testName}${"*".repeat(10)}`);
+    const funForTest = testName === "cipherTest" ? shiftCipher : shiftDecipher;
+    data.forEach((obj => console.log(`str=${obj.str}, shift=${obj.shift || 1} => ${funForTest(obj.str, obj.shift)}`)));
+}
+const dataForCipherTest = [
+    { str: "abc" }, { str: "abz", shift: 1000 }
+];
+testCipherDecipher(dataForCipherTest, "cipherTest");
+const dataForDecipherTest = [
+    { str: "bcd" }, { str: "mnl", shift: 1000 }
+];
+testCipherDecipher(dataForDecipherTest, "decipherTest");
 //# sourceMappingURL=app.js.map
